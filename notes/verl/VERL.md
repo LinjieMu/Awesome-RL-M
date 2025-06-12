@@ -23,7 +23,7 @@
 ##### 现代的推理/训练引擎
 
 - 推理引擎（rollout engine）：VLLM、SGLang
-- 训练引擎（training engine）：FSDP、DeepSpeed、Megaton
+- 训练引擎（training engine）：FSDP、DeepSpeed、Megatron
 
 ##### 资源组共用方法
 
@@ -71,4 +71,38 @@ PPO 训练流水管线：
 >
 >  - `RayPPOTrainer`: The main coordinator class that orchestrates PPO training
 >    -  sequence generation, reward computation, advantage estimation, and policy updates
->  - `FSDPSFTTrainer`: Handles supervised fine-tuning using FSDP backend 
+>  - `FSDPSFTTrainer`: Handles supervised fine-tuning using FSDP backend
+>
+>- Worker Architecture:
+>
+>  - `ActorRolloutRefWorker`: Policy model rollout and training 
+>  - `CriticWorker`: Value function training
+>  - `RewardModelWorker`: compute_reward
+>  - `RefPolicyWorker`: Reference policy for KL constraint
+
+支持的后端:
+
+- 训练框架：FSDP/FSDP2、Megatron
+- 推理框架：VLLM、SGLang、HuggingFace Transformers
+
+支持的RL算法：
+
+- **PPO** (Proximal Policy Optimization): Standard on-policy RL algorithm
+- **GRPO** (Group Relative Policy Optimization): Improved group-based optimization
+- **DAPO** (Data Augmented Policy Optimization): Enhanced with data augmentation
+- **ReMax**: Advanced RL algorithm for reasoning tasks
+- **PRIME**: Process reinforcement through implicit rewards
+- **RLOO**: Reinforcement Learning with Likelihood-based Objective Optimization
+
+DataProto协议： `DataProto` 允许分布式元件之间高效地数据传输和交流
+
+- Automatic data chunking for distributed processing
+- Support for both tensor and non-tensor data
+- Efficient serialization and communication patterns
+- Integration with dispatch modes like `DP_COMPUTE_PROTO`
+
+数据分发模式：
+
+- `ONE_TO_ALL`: Duplicates input to all workers
+- `DP_COMPUTE_PROTO`: Chunks data across workers for data parallel computation
+- `ALL_TO_ALL`: Custom collection patterns for specialized use cases
